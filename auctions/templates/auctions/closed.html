@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section>
+    <h2>Closed Listings</h2>
+        {% for listing in listings %}
+        <a href="{% url 'listing' listing.id %}">
+            {% if listing.image_url %}
+                <img src="{{ listing.image_url }}" alt="My image">
+            {% endif %}
+            <h3>{{ listing.title }} by {{ listing.create_user }}</h3>
+        </a>
+            <p>{{ listing.description}}</p>
+            {% if listing.current_bid != 0 %}
+                <p>Winning price: ${{ listing.current_bid }}</p>
+            {% else %}
+                <p>Winning price: ${{ listing.starting_bid }}</p>
+            {% endif %}
+            <p>Winner: {{ listing.current_bidder }}</p>
+            {% if listing.current_bidder == request.user %}
+                <p class="alert alert-info" style="max-width:50%">You won this auction!</p>
+            {% endif %}
+            <hr>
+        {% endfor %}
+</section>
+{% endblock %}

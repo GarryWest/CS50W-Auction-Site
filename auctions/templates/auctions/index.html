@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<section>
+    <h2>Active Listings</h2>
+    {% if category %}
+        <h3>Category: {{ category }}</h3>
+    {% endif %}
+    {% if watchlist %}
+        <h3>My Watchlist</h3>
+    {% endif %}
+        {% for listing in listings %}
+            <a href="{% url 'listing' listing.id %}">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" alt="My image">
+                {% endif %}
+                <p>{{ listing.title }} by {{ listing.create_user }}</p>
+            </a>
+            <p>{{ listing.description}}</p>
+            {% if listing.current_bid != 0 %}
+                <p>Current price: ${{ listing.current_bid }}</p>
+            {% else %}
+                <p>Current price: ${{ listing.starting_bid }}</p>
+            {% endif %}
+            <hr>
+        {% endfor %}
+</section>
+{% endblock %}

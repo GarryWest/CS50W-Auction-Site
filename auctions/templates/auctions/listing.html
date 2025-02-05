@@ -1,0 +1,97 @@
+{%extends "auctions/layout.html" %}
+
+{%block body%}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm">
+            <h2>{{ listing.title }}</h2>
+        </div>
+        <div class="col-sm">
+            {% if not is_watched%}
+                <form action="{%url 'watch_toggle' listing.id%}" method="post">
+                    {%csrf_token%}
+                    <button type="submit" class="btn btn-primary">Add to Watchlist</button>
+                </form>
+            {% else %}
+                <form action="{%url 'watch_toggle' listing.id%}" method="post">
+                    {%csrf_token%}
+                    <button type="submit" class="btn btn-secondary">Remove from Watchlist</button>
+                </form>
+            {% endif %}
+        </div>
+        {% if listing.is_active%}
+        <div class="col-sm">
+            {% if listing.create_user == request.user %}
+                <form action="{%url 'listing_close' listing.id%}" method="post">
+                    {%csrf_token%}
+                    <button type="submit" class="btn btn-danger">Close Listing</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+<section>
+    {% if listing.image_url %}
+        <img src="{{ listing.image_url }}" alt="My image">
+    {% endif %}
+
+    <ul>
+        <li>Description: {{ listing.description }}</li>
+        <li>Starting Bid: ${{ listing.starting_bid }}</li>
+        <li>Category: {{ listing.category }}</li>
+        <li>Created by: {{ listing.create_user }}</li>
+        <li>Leading Bidder: {{ listing.current_bidder }}</li>
+        <li>Leading Bid: ${{ listing.current_bid }}</li>
+    </ul>
+    {% if not listing.is_active and listing.current_bidder == request.user %}
+        <p class="alert alert-info" style="max-width:50%">You won this auction!</p>
+    {% endif %}
+</section>
+<hr>
+<section>
+    <h2>Bids</h2>
+    {% if bids %}
+        <ul>
+            {% for bid in bids %}
+                <li>{{ bid.bidder }} bid ${{ bid.amount }} on {{ bid.create_date }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if listing.is_active%}
+    <form action="{%url 'bid_add' listing.id%}" method="post">
+        {%csrf_token%}
+        <div class="form-group">
+            <label for="amount">Enter new bid:</label>
+            <input type="number" class="form-control" id="amount" name="amount" style="width: 100px;">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% endif %}
+</section>
+<hr>
+<section>
+    <h2>Comments</h2>
+    {% if comments %}
+        <ul>
+            {% for comment in comments %}
+                <li>{{ comment.user }} commented on {{ comment.create_date }}: 
+                    <p style="max-width: 50%; background-color: lightblue;">{{ comment.content }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if listing.is_active%}
+    <form action="{%url 'comment_add' listing.id%}" method="post">
+        {%csrf_token%}
+        <div class="form-group">
+            <label for="content">Enter new comment:</label>
+            <textarea class="form-control" id="content" name="content" style="max-width: 50%"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    {% endif %}
+</section>
+
+</div>
+{%endblock%}
